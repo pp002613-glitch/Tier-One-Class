@@ -490,19 +490,57 @@
 
         // Form Handling
         function handleFormSubmit(e) {
-            e.preventDefault();
-            const toast = document.getElementById('toast');
             
-            // Show toast
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+             e.preventDefault();
+    
+    // 1. Get the Button and inputs
+    const btn = e.target.querySelector('button');
+    const originalText = btn.innerText;
+    
+    // Replace with the URL you copied in Step 3
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxI-jpvMwyjhLzjCJWgJQu6EVUQYqZxaYr1SRViISsROvrH4AiTlr1Y5hS25_r4Z2M1cw/exec';
 
-            // Clear form
-            e.target.reset();
+    // 2. Prepare Data
+    const formData = {
+        name: e.target.querySelector('input[placeholder="John Doe"]').value, // Or add id="name" to input
+        phone: e.target.querySelector('input[placeholder="+91..."]').value,
+        email: e.target.querySelector('input[placeholder="john@example.com"]').value,
+        goal: e.target.querySelector('select').value,
+        message: e.target.querySelector('textarea').value
+    };
+
+    // 3. Loading State
+    btn.innerText = "Sending...";
+    btn.disabled = true;
+
+    // 4. Send to Google Sheets
+    fetch(scriptURL, {
+        method: 'POST',
+        // This is important for Google Apps Script to read the body
+        body: JSON.stringify(formData)
+    })
+    .then(response => {
+        // Success Logic
+        const toast = document.getElementById('toast');
+        toast.classList.remove('translate-y-20', 'opacity-0');
+        
+        // Hide toast after 3 seconds
+        setTimeout(() => {
+            toast.classList.add('translate-y-20', 'opacity-0');
+        }, 3000);
+
+        // Reset form
+        e.target.reset();
+        btn.innerText = originalText;
+        btn.disabled = false;
+    })
+    .catch(error => {
+        console.error('Error!', error.message);
+        alert("Something went wrong. Please check your internet connection.");
+        btn.innerText = originalText;
+        btn.disabled = false;
+    });
+
         }
     </script>
 </body>
